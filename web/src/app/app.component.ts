@@ -3,42 +3,50 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { FormsModule } from '@angular/forms';  // Importar FormsModule para usar ngModel
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NgxPaginationModule, FormsModule],  // Asegúrate de importar FormsModule
+  imports: [CommonModule, HttpClientModule, NgxPaginationModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   changeDetection: ChangeDetectionStrategy.Default
 })
 export class AppComponent implements OnInit {
-  allIssues: any[] = [];  // Array para almacenar las issues
-  repoUrl: string = '';  // URL del repositorio ingresada por el usuario
-  page = 1;  // Página actual para ngx-pagination
-  itemsPerPage = 5;  // Número de issues por página
+  allIssues: any[] = [];
+  repoUrl: string = '';
+  page = 1;
+  itemsPerPage = 5;
+  error = false;
+  errorMesage = "";
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.fetchIssues();  // Cargar issues por defecto cuando no hay URL
+    this.fetchIssues();
   }
 
-  // Función para obtener issues desde la API de GitHub
   fetchIssues(): void {
-    if (!this.repoUrl) return;  // Si la URL está vacía, no hacemos nada.
+    this.error = false;
+    if (!this.repoUrl) return;
 
     const apiUrl = `https://api.github.com/repos/${this.repoUrl}/issues`;
 
     this.http.get<any[]>(apiUrl).subscribe({
       next: (data) => {
         this.allIssues = data;
-        console.log(this.allIssues);  // Ver las issues en consola (opcional)
+        console.log(this.allIssues);
       },
       error: (error) => {
-        console.error('Error al obtener las issues:', error);
+        this.errorMesage = "Error al obtener las incidencias";
+        this.error = true;
       }
     });
+  }
+
+  // Aquí, utilizamos `navigator` global
+  isOffline(): boolean {
+    return !navigator.onLine;
   }
 }
