@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NgxPaginationModule, FormsModule],
+  imports: [CommonModule, HttpClientModule, NgxPaginationModule, FormsModule],  // Aquí agregamos TranslateModule
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   changeDetection: ChangeDetectionStrategy.Default
@@ -21,7 +21,8 @@ export class AppComponent implements OnInit {
   error = false;
   errorMesage = "";
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
 
   ngOnInit(): void {
     this.fetchIssues();
@@ -33,19 +34,32 @@ export class AppComponent implements OnInit {
 
     const apiUrl = `https://api.github.com/repos/${this.repoUrl}/issues`;
 
+    if (!navigator.onLine) {
+      const cached = localStorage.getItem(apiUrl);
+      if (cached) {
+        this.allIssues = JSON.parse(cached);
+      } else {
+        this.errorMesage = 'Sin conexión y sin datos en caché';
+        this.error = true;
+        this.allIssues = [];
+      }
+      return;
+    }
+
     this.http.get<any[]>(apiUrl).subscribe({
       next: (data) => {
         this.allIssues = data;
-        console.log(this.allIssues);
+        localStorage.setItem(apiUrl, JSON.stringify(data)); // Guardamos la respuesta
       },
       error: (error) => {
         this.errorMesage = "Error al obtener las incidencias";
         this.error = true;
+        this.allIssues = [];
       }
     });
   }
 
-  // Aquí, utilizamos `navigator` global
+  // Método para verificar si el navegador está offline
   isOffline(): boolean {
     return !navigator.onLine;
   }
