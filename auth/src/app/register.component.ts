@@ -35,11 +35,10 @@ export class RegisterComponent {
       this.authService.register({ username, email, password }).subscribe({
         next: (res) => {
           console.log('Registro exitoso', res);
-          this.router.navigate(['/login']); // redirige al login
+          this.router.navigate(['/login']);
         },
         error: (err) => {
           console.error('Error al registrar', err);
-          // Aquí puedes mostrar un mensaje al usuario
         },
       });
     }

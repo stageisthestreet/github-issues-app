@@ -20,7 +20,7 @@ export class LoginComponent {
     private router: Router
   ) {
     this.loginForm = this.fb.group({
-      identifier: ['', Validators.required], // puede ser email o username
+      identifier: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
@@ -32,11 +32,10 @@ export class LoginComponent {
       this.authService.login({ identifier, password }).subscribe({
         next: (res) => {
           console.log('Login exitoso', res);
-          window.location.href = 'https://www.irontec.com/quienes-somos/';// redirige a home o donde quieras
+          window.location.href = 'https://www.irontec.com/quienes-somos/';
         },
         error: (err) => {
           console.error('Error al iniciar sesión', err);
-          // puedes mostrar un error al usuario si quieres
         },
       });
     }
