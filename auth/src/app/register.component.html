@@ -1,59 +1,75 @@
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
-      <h3 class="text-center mb-4">Registrarse</h3>
-      <form [formGroup]="registerForm" (ngSubmit)="register()">
-        <div class="mb-3">
-          <label for="email" class="form-label">Correo electrónico</label>
-          <input
-            type="email"
-            id="email"
-            class="form-control"
-            formControlName="email"
-            placeholder="Ingrese su correo electrónico"
-            required
-          />
+  <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
+    <h3 class="text-center mb-4">Registrarse</h3>
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
+      
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico</label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          formControlName="email"
+          placeholder="Ingrese su correo electrónico"
+        />
+        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="alert alert-danger mt-2">
+          <div *ngIf="registerForm.get('email')?.hasError('required')">El correo electrónico es obligatorio.</div>
+          <div *ngIf="registerForm.get('email')?.hasError('email')">El formato del correo electrónico no es válido.</div>
         </div>
-  
-        <div class="mb-3">
-          <label for="username" class="form-label">Nombre de usuario</label>
-          <input
-            type="text"
-            id="username"
-            class="form-control"
-            formControlName="username"
-            placeholder="Ingrese su nombre de usuario"
-            required
-          />
+      </div>
+
+      <div class="mb-3">
+        <label for="username" class="form-label">Nombre de usuario</label>
+        <input
+          type="text"
+          id="username"
+          class="form-control"
+          formControlName="username"
+          placeholder="Ingrese su nombre de usuario"
+        />
+        <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="alert alert-danger mt-2">
+          <div *ngIf="registerForm.get('username')?.hasError('required')">El nombre de usuario es obligatorio.</div>
+          <div *ngIf="registerForm.get('username')?.hasError('minlength')">Debe tener al menos 3 caracteres.</div>
         </div>
-  
-        <div class="mb-3">
-          <label for="password" class="form-label">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            class="form-control"
-            formControlName="password"
-            placeholder="Ingrese su contraseña"
-            required
-          />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          formControlName="password"
+          placeholder="Ingrese su contraseña"
+        />
+        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="alert alert-danger mt-2">
+          <div *ngIf="registerForm.get('password')?.hasError('required')">La contraseña es obligatoria.</div>
+          <div *ngIf="registerForm.get('password')?.hasError('minlength')">Debe tener al menos 6 caracteres.</div>
         </div>
-  
-        <div class="mb-3">
-          <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            class="form-control"
-            formControlName="confirmPassword"
-            placeholder="Confirme su contraseña"
-            required
-          />
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          class="form-control"
+          formControlName="confirmPassword"
+          placeholder="Confirme su contraseña"
+        />
+        <div *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched" class="alert alert-danger mt-2">
+          Las contraseñas no coinciden.
         </div>
-  
-        <div class="d-flex justify-content-between align-items-center">
-          <button type="submit" class="btn btn-success">Registrarse</button>
-          <a [routerLink]="['/login']" class="text-decoration-none">¿Ya tienes cuenta? Inicia sesión</a>
-        </div>
-      </form>
-    </div>
+      </div>
+
+      <div *ngIf="registerErrorMessage" class="alert alert-danger mt-3">
+        {{ registerErrorMessage }}
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <button type="submit" class="btn btn-success" [disabled]="registerForm.invalid">Registrarse</button>
+        <a [routerLink]="['/login']" class="text-decoration-none">¿Ya tienes cuenta? Inicia sesión</a>
+      </div>
+    </form>
   </div>
+</div>

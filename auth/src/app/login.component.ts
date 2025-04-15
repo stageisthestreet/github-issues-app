@@ -12,16 +12,20 @@ import { AuthService } from './auth.service';
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  http: any;
-  
+  loginErrorMessage: string = '';
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
-      identifier: ['', Validators.required],
-      password: ['', Validators.required],
+      identifier: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+
+    this.loginForm.valueChanges.subscribe(() => {
+      this.loginErrorMessage = '';
     });
   }
 
@@ -36,6 +40,7 @@ export class LoginComponent {
         },
         error: (err) => {
           console.error('Error al iniciar sesión', err);
+          this.loginErrorMessage = 'Credenciales incorrectas. Intenta de nuevo.';
         },
       });
     }

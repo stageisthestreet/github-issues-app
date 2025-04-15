@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from './auth.service';
 
-
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -13,7 +12,7 @@ import { AuthService } from './auth.service';
 })
 export class RegisterComponent {
   registerForm: FormGroup;
-  http: any;
+  registerErrorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -21,11 +20,23 @@ export class RegisterComponent {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
-      username: ['', Validators.required],
+      username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]],
+    }, {
+      validators: this.passwordsMatchValidator
     });
+    
+    this.registerForm.valueChanges.subscribe(() => {
+      this.registerErrorMessage = '';
+    });
+  }
+
+  private passwordsMatchValidator(form: FormGroup) {
+    const password = form.get('password')?.value;
+    const confirmPassword = form.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { mismatch: true };
   }
 
   register() {
@@ -39,6 +50,7 @@ export class RegisterComponent {
         },
         error: (err) => {
           console.error('Error al registrar', err);
+          this.registerErrorMessage = 'Ocurrió un error durante el registro. Inténtalo de nuevo.';
         },
       });
     }

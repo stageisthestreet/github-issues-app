@@ -1,35 +1,43 @@
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
-      <h3 class="text-center mb-4">Iniciar sesión</h3>
-      <form [formGroup]="loginForm" (ngSubmit)="login()">
-        <div class="mb-3">
-          <label for="identifier" class="form-label">Correo electrónico</label>
-          <input
-            type="identifier"
-            id="identifier"
-            class="form-control"
-            formControlName="identifier"
-            placeholder="Ingrese su correo electrónico"
-            required
-          />
+  <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
+    <h3 class="text-center mb-4">Iniciar sesión</h3>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <div class="mb-3">
+        <label for="identifier" class="form-label">Correo electrónico</label>
+        <input
+          type="email"
+          id="identifier"
+          class="form-control"
+          formControlName="identifier"
+          placeholder="Ingrese su correo electrónico"
+        />
+        <div *ngIf="loginForm.controls['identifier'].invalid && loginForm.controls['identifier'].touched" class="alert alert-danger mt-2">
+          <div *ngIf="loginForm.controls['identifier'].hasError('required')">El correo electrónico es obligatorio.</div>
+          <div *ngIf="loginForm.controls['identifier'].hasError('email')">El formato del correo electrónico no es válido.</div>
         </div>
-  
-        <div class="mb-3">
-          <label for="password" class="form-label">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            class="form-control"
-            formControlName="password"
-            placeholder="Ingrese su contraseña"
-            required
-          />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          formControlName="password"
+          placeholder="Ingrese su contraseña"
+        />
+        <div *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched" class="alert alert-danger mt-2">
+          <div *ngIf="loginForm.controls['password'].hasError('required')">La contraseña es obligatoria.</div>
+          <div *ngIf="loginForm.controls['password'].hasError('minlength')">La contraseña debe tener al menos 6 caracteres.</div>
         </div>
-  
-        <div class="d-flex justify-content-between align-items-center">
-          <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-          <a [routerLink]="['/register']" class="text-decoration-none">¿No tienes cuenta? Regístrate</a>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div *ngIf="loginErrorMessage" class="alert alert-danger mt-3">
+        {{ loginErrorMessage }}
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Iniciar sesión</button>
+        <a [routerLink]="['/register']" class="text-decoration-none">¿No tienes cuenta? Regístrate</a>
+      </div>
+    </form>
   </div>
+</div>
