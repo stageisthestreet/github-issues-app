@@ -22,7 +22,7 @@ import { Observable } from 'rxjs';
   imports: [CommonModule, HttpClientModule, NgxPaginationModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   private store = inject(Store);
@@ -30,13 +30,14 @@ export class AppComponent implements OnInit {
   repoUrl: string = '';
   page = 1;
   itemsPerPage = 5;
-  error = false;
+  //error = false;
   error$!: Observable<string | null>;
   allIssues$!: Observable<any[]>;
 
   ngOnInit(): void {
     // Seleccionamos el estado de los issues y el error desde el store
     this.allIssues$ = this.store.select(issuesSelector);
+    this.error$ = this.store.select(errorSelector);
   }
 
   fetchIssues(): void {

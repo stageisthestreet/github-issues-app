@@ -12,17 +12,17 @@
     </div>
 
     <!-- Mensaje de error -->
-    <div *ngIf="error$ | async as error" class="alert alert-danger">
+    <div *ngIf="error$ | async as error" class="alert alert-danger mt-4">
         Error: {{ error }}
     </div>
 
     <!-- Mensaje offline -->
-    <div *ngIf="isOffline()" class="alert alert-warning text-center">
+    <div *ngIf="isOffline()" class="alert alert-warning mt-4">
         Estás sin conexión. Mostrando datos en caché si están disponibles.
     </div>
 
     <!-- Tabla de incidencias -->
-    <ng-container *ngIf="!error$">
+    <ng-container *ngIf="!(error$ | async)">
         <table *ngIf="allIssues$ | async as allIssues" class="table table-bordered mt-5 text-center">
             <thead class="table-light">
                 <tr>

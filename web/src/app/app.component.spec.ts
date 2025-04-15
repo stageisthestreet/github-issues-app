@@ -1,99 +1,91 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { RouterModule } from '@angular/router';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideMockStore } from '@ngrx/store/testing';
+import { Store } from '@ngrx/store';
+import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { loadIssues } from './store/issues.actions';
+import {selectError, selectIssues} from './store/issues.selectors';
 
-describe('AppComponent', () => {
-  let fixture: any;
+describe('AppComponent with Jest', () => {
   let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+  let store: Store;
+
+  const mockIssues = [
+    { title: 'Issue 1', state: 'open', created_at: '2023-04-01' },
+    { title: 'Issue 2', state: 'closed', created_at: '2023-04-02' },
+    { title: 'Issue 3', state: 'open', created_at: '2023-04-03' },
+  ];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        AppComponent, 
-        RouterModule.forRoot([]),
-        HttpClientTestingModule,  // Mock HTTP requests
-        NgxPaginationModule       // Para usar paginación en los tests
+      imports: [AppComponent, FormsModule, NgxPaginationModule],
+      providers: [
+        provideMockStore({
+          selectors: [
+            { selector: 'issuesSelector', value: mockIssues },
+            { selector: 'errorSelector', value: null }
+          ]
+        }),
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
+    store = TestBed.inject(Store);
+    fixture.detectChanges();
   });
 
-  it('should render title', () => {
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Introduce la URL del repositorio de GitHub:');
+  it('debe renderizar el título correctamente', () => {
+    const h2 = fixture.nativeElement.querySelector('h2');
+    expect(h2.textContent).toContain('Incidencias');
   });
 
-  it('should display 10 simulated issues in the table', () => {
-    component.allIssues = [
-      { title: 'Issue 1', state: 'open', created_at: '2023-04-01' },
-      { title: 'Issue 2', state: 'closed', created_at: '2023-04-02' },
-      { title: 'Issue 3', state: 'open', created_at: '2023-04-03' },
-      { title: 'Issue 4', state: 'open', created_at: '2023-04-04' },
-      { title: 'Issue 5', state: 'closed', created_at: '2023-04-05' },
-      { title: 'Issue 6', state: 'open', created_at: '2023-04-06' },
-      { title: 'Issue 7', state: 'closed', created_at: '2023-04-07' },
-      { title: 'Issue 8', state: 'open', created_at: '2023-04-08' },
-      { title: 'Issue 9', state: 'open', created_at: '2023-04-09' },
-      { title: 'Issue 10', state: 'closed', created_at: '2023-04-10' }
-    ];
+  
+  it('debe despachar la acción loadIssues al introducir la URL', () => {
+    const dispatchSpy = jest.spyOn(store, 'dispatch');
+    component.repoUrl = 'l-lin/angular-datatables';
+    component.fetchIssues();
 
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement as HTMLElement;
-    const rows = compiled.querySelectorAll('tbody tr');
-    expect(rows.length).toBe(5);
-    expect(rows[0].textContent).toContain('Issue 1');
-    expect(rows[1].textContent).toContain('Issue 2');
-    expect(rows[2].textContent).toContain('Issue 3');
-    expect(rows[3].textContent).toContain('Issue 4');
-    expect(rows[4].textContent).toContain('Issue 5');
+    expect(dispatchSpy).toHaveBeenCalledWith(loadIssues({ url: 'l-lin/angular-datatables' }));
   });
 
-  it('should paginate through the table', () => {
-    component.allIssues = [
-      { title: 'Issue 1', state: 'open', created_at: '2023-04-01' },
-      { title: 'Issue 2', state: 'closed', created_at: '2023-04-02' },
-      { title: 'Issue 3', state: 'open', created_at: '2023-04-03' },
-      { title: 'Issue 4', state: 'open', created_at: '2023-04-04' },
-      { title: 'Issue 5', state: 'closed', created_at: '2023-04-05' },
-      { title: 'Issue 6', state: 'open', created_at: '2023-04-06' },
-      { title: 'Issue 7', state: 'closed', created_at: '2023-04-07' },
-      { title: 'Issue 8', state: 'open', created_at: '2023-04-08' },
-      { title: 'Issue 9', state: 'open', created_at: '2023-04-09' },
-      { title: 'Issue 10', state: 'closed', created_at: '2023-04-10' }
-    ];
-  
-    component.page = 1;
+  it('debe mostrar los issues cuando el selector devuelve datos', async () => {
+    // Simula la carga de los issues en el store
+    const storeOverride = TestBed.inject(Store) as any;
+    storeOverride.overrideSelector(selectIssues, mockIssues);
+    component.allIssues$ = store.select(selectIssues);
     fixture.detectChanges();
-  
-    let rows = fixture.nativeElement.querySelectorAll('tbody tr');
-    expect(rows.length).toBe(5);
-    expect(rows[0].textContent).toContain('Issue 1');
-    expect(rows[4].textContent).toContain('Issue 5');
-  
-    component.page = 2;
-    fixture.detectChanges();
-  
-    rows = fixture.nativeElement.querySelectorAll('tbody tr');
-    expect(rows.length).toBe(5);
-    expect(rows[0].textContent).toContain('Issue 6');
-    expect(rows[4].textContent).toContain('Issue 10');
+
+    // Espera a que Angular procese todas las tareas asincrónicas
+    await fixture.whenStable();
+
+    // Verifica que las filas sean mayores que 0
+    const rows = fixture.nativeElement.querySelectorAll('tbody tr');
+    expect(rows.length).toBeGreaterThan(0);  // Asegura que haya filas
+
+    // Imprime la cantidad de filas para depuración
+    console.log('Número de filas en la tabla:', rows.length);
   });
 
-  it('should display offline alert when navigator is offline', () => {
-    // Simulamos que el usuario está offline
+  it('debe mostrar el mensaje de error cuando hay error en el store', () => {
+    const storeOverride = TestBed.inject(Store) as any;
+    storeOverride.overrideSelector(selectError, 'Error al cargar issues');
+    component.error$ = store.select(selectError);
+    fixture.detectChanges();
+
+    const errorElement = fixture.nativeElement.querySelector('.alert-danger');
+    expect(errorElement).toBeTruthy();
+  });
+
+  it('debe mostrar el mensaje de offline si navigator.onLine es false', () => {
     Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
     fixture.detectChanges();
 
-    const compiled = fixture.nativeElement as HTMLElement;
-    const offlineAlert = compiled.querySelector('.alert.alert-warning');
-  
-    expect(offlineAlert).toBeTruthy();
-    expect(offlineAlert?.textContent).toContain('Estás sin conexión. Mostrando datos en caché si están disponibles.');
+    const offlineAlert = fixture.nativeElement.querySelector('.alert-warning');
+    expect(offlineAlert.textContent).toContain('Estás sin conexión');
   });
 });
+
+

@@ -24,7 +24,8 @@ export class IssuesEffects {
         this.issues.fetchIssues(url).pipe(
           map((issues) => {
             return loadIssuesSuccess({ issues })}), // Si la llamada es exitosa
-          catchError((error) => of(loadIssuesFailure({ error: error.message }))) // Si ocurre un error, usamos 'of' para emitir un error
+          catchError((error) => {
+            return of(loadIssuesFailure({ error: error.error.message }))}) // Si ocurre un error, usamos 'of' para emitir un error
         )        
       )
     )
