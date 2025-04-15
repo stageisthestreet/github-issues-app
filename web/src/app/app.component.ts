@@ -31,13 +31,11 @@ export class AppComponent implements OnInit {
   repoUrl: string = '';
   page = 1;
   itemsPerPage = 5;
-  //error = false;
   error$!: Observable<string | null>;
   loading$!: Observable<string | null>;
   allIssues$!: Observable<any[]>;
 
   ngOnInit(): void {
-    // Seleccionamos el estado de los issues y el error desde el store
     this.allIssues$ = this.store.select(issuesSelector);
     this.error$ = this.store.select(errorSelector);
     this.loading$ = this.store.select(loadingSelector);
@@ -46,12 +44,11 @@ export class AppComponent implements OnInit {
   fetchIssues(): void {
     if (!this.repoUrl) return;
 
-    // Despachamos la acción para cargar los issues
     this.store.dispatch(loadIssues({ url: this.repoUrl }));
-    console.log('Despachando acción para cargar issues...');
+
   }
 
   isOffline(): boolean {
-    return !navigator.onLine; // Verifica si el usuario está offline
+    return !navigator.onLine;
   }
 }

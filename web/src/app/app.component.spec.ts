@@ -52,20 +52,17 @@ describe('AppComponent with Jest', () => {
   });
 
   it('debe mostrar los issues cuando el selector devuelve datos', async () => {
-    // Simula la carga de los issues en el store
+
     const storeOverride = TestBed.inject(Store) as any;
     storeOverride.overrideSelector(selectIssues, mockIssues);
     component.allIssues$ = store.select(selectIssues);
     fixture.detectChanges();
 
-    // Espera a que Angular procese todas las tareas asincrónicas
     await fixture.whenStable();
 
-    // Verifica que las filas sean mayores que 0
     const rows = fixture.nativeElement.querySelectorAll('tbody tr');
-    expect(rows.length).toBeGreaterThan(0);  // Asegura que haya filas
+    expect(rows.length).toBeGreaterThan(0);
 
-    // Imprime la cantidad de filas para depuración
     console.log('Número de filas en la tabla:', rows.length);
   });
 

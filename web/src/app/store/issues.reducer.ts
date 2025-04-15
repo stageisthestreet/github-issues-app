@@ -3,9 +3,9 @@ import { loadIssues, loadIssuesSuccess, loadIssuesFailure } from './issues.actio
 export const IssueFeatureKey = 'IssueStore'
 
 export interface IssueState {
-  issues: any[]; // Lista de issues
-  loading: boolean; // Estado de carga
-  error: string | null; // Mensaje de error
+  issues: any[];
+  loading: boolean;
+  error: string | null;
 }
 
 export const initialState: IssueState = {
@@ -18,21 +18,21 @@ export const issuesReducer = createReducer(
   initialState,
   on(loadIssues, (state) => ({
     ...state,
-    loading: true, // Cuando se carga, cambiamos el estado a cargando
+    loading: true,
   })),
   on(loadIssuesSuccess, (state, { issues }) => {
-    console.log('Issues actualizadas en el reducer:', issues); // Verifica las issues
+    console.log('Issues actualizadas en el reducer:', issues);
     return {
       ...state,
-      issues, // Actualiza las issues en el estado
-      loading: false, // Finaliza el estado de carga
-      error: null, // Limpiamos cualquier error anterior
+      issues,
+      loading: false,
+      error: null,
     };
   }),
   on(loadIssuesFailure, (state, { error }) => ({
     ...state,
     issues: [],
-    loading: false, // Finaliza el estado de carga
-    error, // Guardamos el error
+    loading: false,
+    error,
   }))
 );
