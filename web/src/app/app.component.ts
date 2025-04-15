@@ -13,6 +13,7 @@ import { loadIssues } from './store/issues.actions';
 import {
   errorSelector,
   issuesSelector,
+  loadingSelector,
 } from './store/issues.selectors';
 import { Observable } from 'rxjs';
 
@@ -32,12 +33,14 @@ export class AppComponent implements OnInit {
   itemsPerPage = 5;
   //error = false;
   error$!: Observable<string | null>;
+  loading$!: Observable<string | null>;
   allIssues$!: Observable<any[]>;
 
   ngOnInit(): void {
     // Seleccionamos el estado de los issues y el error desde el store
     this.allIssues$ = this.store.select(issuesSelector);
     this.error$ = this.store.select(errorSelector);
+    this.loading$ = this.store.select(loadingSelector);
   }
 
   fetchIssues(): void {
