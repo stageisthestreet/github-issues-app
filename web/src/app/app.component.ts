@@ -1,66 +1,53 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { loadIssues } from './store/issues.actions';
+import {
+  errorSelector,
+  issuesSelector,
+} from './store/issues.selectors';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NgxPaginationModule, FormsModule],  // Aquí agregamos TranslateModule
+  imports: [CommonModule, HttpClientModule, NgxPaginationModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AppComponent implements OnInit {
-  allIssues: any[] = [];
+  private store = inject(Store);
+
   repoUrl: string = '';
   page = 1;
   itemsPerPage = 5;
   error = false;
-  errorMesage = "";
-
-  constructor(private http: HttpClient) {
-  }
+  error$!: Observable<string | null>;
+  allIssues$!: Observable<any[]>;
 
   ngOnInit(): void {
-    this.fetchIssues();
+    // Seleccionamos el estado de los issues y el error desde el store
+    this.allIssues$ = this.store.select(issuesSelector);
   }
 
   fetchIssues(): void {
-    this.error = false;
     if (!this.repoUrl) return;
 
-    const apiUrl = `https://api.github.com/repos/${this.repoUrl}/issues`;
-
-    if (!navigator.onLine) {
-      const cached = localStorage.getItem(apiUrl);
-      if (cached) {
-        this.allIssues = JSON.parse(cached);
-      } else {
-        this.errorMesage = 'Sin conexión y sin datos en caché';
-        this.error = true;
-        this.allIssues = [];
-      }
-      return;
-    }
-
-    this.http.get<any[]>(apiUrl).subscribe({
-      next: (data) => {
-        this.allIssues = data;
-        localStorage.setItem(apiUrl, JSON.stringify(data)); // Guardamos la respuesta
-      },
-      error: (error) => {
-        this.errorMesage = "Error al obtener las incidencias";
-        this.error = true;
-        this.allIssues = [];
-      }
-    });
+    // Despachamos la acción para cargar los issues
+    this.store.dispatch(loadIssues({ url: this.repoUrl }));
+    console.log('Despachando acción para cargar issues...');
   }
 
-  // Método para verificar si el navegador está offline
   isOffline(): boolean {
-    return !navigator.onLine;
+    return !navigator.onLine; // Verifica si el usuario está offline
   }
 }
