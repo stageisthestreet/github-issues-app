@@ -12,4 +12,4 @@
 
 - Para lanzar las pruebas unitarias de este mismo proyecto, vamos a lanzar el comando "npx nx test web"
 
-- Para ejecutar el segundo proyecto, y al estar separado el strapi de la parte del angular, he instalado la dependencia de "concurrently", por lo que he comando que vamos a utilizar para poder probarlo todo a la vez, sera "npm run start:all"
+- Para ejecutar el segundo proyecto, y al estar separado el strapi de la parte del angular, he instalado la dependencia de "concurrently", por lo que el comando que vamos a utilizar para poder probarlo todo a la vez, sera "npm run start:all"
